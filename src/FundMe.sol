@@ -27,7 +27,7 @@ contract FundMe {
         }
         s_funders = new address[](0);
 
-        (bool success, ) = payable(i_owner).call{value: address(this).balance}("");
+        (bool success,) = payable(i_owner).call{value: address(this).balance}("");
         require(success, "Withdraw failed");
     }
 

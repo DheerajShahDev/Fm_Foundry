@@ -74,27 +74,26 @@ contract FundMeTest is Test {
     }
 
     function testWithDrawWithMultipleFunders() public funded {
-    uint160 numberOfFunders = 10;
-    uint256 startingFunderIndex = 1;
+        uint160 numberOfFunders = 10;
+        uint256 startingFunderIndex = 1;
 
-    for (uint256 i = startingFunderIndex; i < numberOfFunders; i++) {
-        hoax(address(uint160(i)), 10e18);
-        fundMe.fund{value: 10e18}();
+        for (uint256 i = startingFunderIndex; i < numberOfFunders; i++) {
+            hoax(address(uint160(i)), 10e18);
+            fundMe.fund{value: 10e18}();
+        }
+
+        uint256 startingOwnerBalance = fundMe.i_owner().balance;
+        uint256 startingFundMeBalance = address(fundMe).balance;
+
+        vm.startPrank(fundMe.i_owner());
+        fundMe.withdraw();
+        vm.stopPrank();
+
+        assertEq(address(fundMe).balance, 0, "FundMe balance should be 0 after withdrawal");
+        assertEq(
+            fundMe.i_owner().balance,
+            startingFundMeBalance + startingOwnerBalance,
+            "Owner balance should equal starting balance + FundMe balance"
+        );
     }
-
-    uint256 startingOwnerBalance = fundMe.i_owner().balance;
-    uint256 startingFundMeBalance = address(fundMe).balance;
-
-    vm.startPrank(fundMe.i_owner());
-    fundMe.withdraw();
-    vm.stopPrank();
-
-    assertEq(address(fundMe).balance, 0, "FundMe balance should be 0 after withdrawal");
-    assertEq(
-        fundMe.i_owner().balance,
-        startingFundMeBalance + startingOwnerBalance,
-        "Owner balance should equal starting balance + FundMe balance"
-    );
-}
-
 }
